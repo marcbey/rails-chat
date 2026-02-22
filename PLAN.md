@@ -35,6 +35,7 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 16. Lokales Docker-Web startet via `bin/dev`
 17. Rails-Stack: `postgresql + importmap + tailwind`
 18. Primärschlüssel in Domänenmodellen: UUID
+19. Keine dedizierten Background-Worker im Testprojekt; Web läuft mit `ActiveJob :async` (kein `Solid Queue` in Puma)
 
 ## 3. Zielarchitektur (Service-Split)
 
@@ -44,6 +45,7 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 - Serviert HTML/Turbo Responses und WebSocket-Verbindungen
 - Containerisiert (Docker), deployt via Kamal auf mehrere EC2 Hosts
 - Läuft hinter einem ALB
+- Kein Solid-Queue-Supervisor im Web-Prozess
 
 ### 3.2 Datenbank Service
 
@@ -192,7 +194,6 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 
 - `deploy-staging.yml`
 - Trigger: `push` auf `main`
-- Voraussetzung: erfolgreiches `ci.yml` auf gleichem Commit
 - Action: Kamal Deploy auf Staging
 
 - `deploy-production.yml`
@@ -232,13 +233,14 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 - `AWS_ROLE_ARN`
 - `AWS_REGION` (`eu-central-1`)
 - `ECR_REGISTRY`
-- `KAMAL_REGISTRY_PASSWORD`
 - `RAILS_MASTER_KEY_STAGING`
 - `RAILS_MASTER_KEY_PRODUCTION`
 - `DATABASE_URL_STAGING`
 - `DATABASE_URL_PRODUCTION`
 - `SECRET_KEY_BASE_STAGING`
 - `SECRET_KEY_BASE_PRODUCTION`
+
+Hinweis: `KAMAL_REGISTRY_PASSWORD` wird in den Deploy-Workflows dynamisch via `aws ecr get-login-password` erzeugt und muss nicht als GitHub Secret gepflegt werden.
 
 ## 8. Terraform IaC Plan (AWS)
 

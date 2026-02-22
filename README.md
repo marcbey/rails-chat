@@ -68,6 +68,11 @@ Workflows:
 - `.github/workflows/deploy-production.yml`
 - `.github/workflows/terraform-plan.yml`
 
+Deploy-Verhalten:
+
+- `staging`: automatisch bei jedem Push auf `main`
+- `production`: manuell per `workflow_dispatch`
+
 Erwartete GitHub Secrets:
 
 - `AWS_REGION` (`eu-central-1`)
@@ -79,6 +84,8 @@ Erwartete GitHub Secrets:
 - `DATABASE_URL_PRODUCTION`
 - `SECRET_KEY_BASE_STAGING`
 - `SECRET_KEY_BASE_PRODUCTION`
+
+Hinweis: `KAMAL_REGISTRY_PASSWORD` wird zur Laufzeit aus AWS ECR geholt und ist kein statisches Secret.
 
 Environment `staging`:
 
