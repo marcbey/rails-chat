@@ -57,4 +57,4 @@ jobs:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_STAGING }}
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE_STAGING }}
-        run: bundle exec kamal deploy -d staging -v
+        run: bundle exec kamal deploy -d staging --skip-push --version "${GITHUB_SHA}" -v

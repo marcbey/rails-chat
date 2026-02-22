@@ -56,4 +56,4 @@ jobs:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_PRODUCTION }}
           DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE_PRODUCTION }}
-        run: bundle exec kamal deploy -d production -v
+        run: bundle exec kamal deploy -d production --skip-push --version "${GITHUB_SHA}" -v

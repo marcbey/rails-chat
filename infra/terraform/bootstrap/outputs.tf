@@ -5,3 +5,7 @@ output "state_bucket_name" {
 output "lock_table_name" {
   value = aws_dynamodb_table.tf_lock.name
 }
+
+output "github_oidc_provider_arn" {
+  value = aws_iam_openid_connect_provider.github_actions.arn
+}
