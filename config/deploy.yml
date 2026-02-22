@@ -1,5 +1,5 @@
 service: rails-chat
-image: <%= ENV.fetch("ECR_REGISTRY", "000000000000.dkr.ecr.eu-central-1.amazonaws.com") %>/rails-chat
+image: <%= ENV.fetch("ECR_IMAGE", "#{ENV.fetch('ECR_REGISTRY', '000000000000.dkr.ecr.eu-central-1.amazonaws.com')}/rails-chat") %>
 
 servers:
   web: <%= ENV.fetch("KAMAL_WEB_HOSTS", "").split(",").map(&:strip).reject(&:empty?) %>

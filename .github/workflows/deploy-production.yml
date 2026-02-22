@@ -20,12 +20,17 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Fetch ECR password for Kamal
+        run: |
+          echo "KAMAL_REGISTRY_PASSWORD=$(aws ecr get-login-password --region "${{ secrets.AWS_REGION }}")" >> "$GITHUB_ENV"
+
       - name: Build and push image
         env:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_IMAGE: ${{ secrets.ECR_IMAGE }}
         run: |
-          docker build -t "$ECR_REGISTRY/rails-chat:${GITHUB_SHA}" .
-          docker push "$ECR_REGISTRY/rails-chat:${GITHUB_SHA}"
+          docker build -t "$ECR_IMAGE:${GITHUB_SHA}" .
+          docker push "$ECR_IMAGE:${GITHUB_SHA}"
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -40,8 +45,9 @@ jobs:
 
       - name: Deploy with Kamal
         env:
-          KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+          KAMAL_REGISTRY_PASSWORD: ${{ env.KAMAL_REGISTRY_PASSWORD }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_IMAGE: ${{ secrets.ECR_IMAGE }}
           KAMAL_WEB_HOSTS: ${{ secrets.PRODUCTION_WEB_HOSTS }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_PRODUCTION }}
           DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
