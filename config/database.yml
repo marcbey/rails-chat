@@ -44,18 +44,16 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: <%= ENV.fetch("POSTGRES_DB_PRODUCTION", "rails_chat_production") %>
-    username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
-    password: <%= ENV["RAILS_CHAT_DATABASE_PASSWORD"] || ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+    url: <%= ENV.fetch("DATABASE_URL") %>
   cache:
     <<: *primary_production
-    database: <%= ENV.fetch("POSTGRES_DB_PRODUCTION_CACHE", "rails_chat_production_cache") %>
+    url: <%= ENV.fetch("CACHE_DATABASE_URL", ENV.fetch("DATABASE_URL")) %>
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: <%= ENV.fetch("POSTGRES_DB_PRODUCTION_QUEUE", "rails_chat_production_queue") %>
+    url: <%= ENV.fetch("QUEUE_DATABASE_URL", ENV.fetch("DATABASE_URL")) %>
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: <%= ENV.fetch("POSTGRES_DB_PRODUCTION_CABLE", "rails_chat_production_cable") %>
+    url: <%= ENV.fetch("CABLE_DATABASE_URL", ENV.fetch("DATABASE_URL")) %>
     migrations_paths: db/cable_migrate
