@@ -47,6 +47,7 @@ bin/docker-dev rspec
 - Web: Rails App (Puma + Turbo + Action Cable)
 - DB: PostgreSQL 18
 - Realtime: Solid Cable (DB-basiert)
+- Jobs im Web-Prozess: `:async` (kein Solid Queue Supervisor in Puma)
 - Ingress (AWS): ALB -> kamal-proxy -> Puma
 
 ## Tests und Qualität
