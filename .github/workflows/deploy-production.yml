@@ -33,7 +33,7 @@ jobs:
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           ECR_IMAGE_NAME: ${{ secrets.ECR_IMAGE_NAME }}
         run: |
-          docker build -t "$ECR_REGISTRY/$ECR_IMAGE_NAME:${GITHUB_SHA}" .
+          docker build --label service=rails-chat -t "$ECR_REGISTRY/$ECR_IMAGE_NAME:${GITHUB_SHA}" .
           docker push "$ECR_REGISTRY/$ECR_IMAGE_NAME:${GITHUB_SHA}"
 
       - uses: ruby/setup-ruby@v1
