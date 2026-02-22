@@ -82,13 +82,13 @@ Erwartete GitHub Secrets:
 Environment `staging`:
 
 - `AWS_ROLE_ARN`
-- `ECR_IMAGE`
+- `ECR_IMAGE_NAME`
 - `STAGING_WEB_HOSTS`
 
 Environment `production`:
 
 - `AWS_ROLE_ARN`
-- `ECR_IMAGE`
+- `ECR_IMAGE_NAME`
 - `PRODUCTION_WEB_HOSTS`
 
 ## Terraform
@@ -132,6 +132,7 @@ Deploy lokal (nur wenn Hosts/Secrets gesetzt sind):
 ```bash
 KAMAL_WEB_HOSTS=1.2.3.4,5.6.7.8 \
 ECR_REGISTRY=xxx.dkr.ecr.eu-central-1.amazonaws.com \
+ECR_IMAGE_NAME=rails-chat-staging/rails-chat \
 KAMAL_REGISTRY_PASSWORD=... \
 RAILS_MASTER_KEY=... \
 DATABASE_URL=... \
