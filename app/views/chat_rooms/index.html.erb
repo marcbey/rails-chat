@@ -1,0 +1,27 @@
+<%= turbo_stream_from "chat_rooms" %>
+
+<div class="grid min-h-[calc(100vh-6rem)] gap-4 lg:grid-cols-[320px_1fr]">
+  <aside class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+    <div class="mb-4">
+      <h1 class="text-lg font-semibold">Räume</h1>
+      <p class="text-sm text-slate-600">Erstelle einen Raum oder wähle einen bestehenden aus.</p>
+    </div>
+
+    <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-3">
+      <%= render "form", chat_room: @chat_room %>
+    </div>
+
+    <div id="chat_rooms" class="space-y-2">
+      <%= render @chat_rooms, active_room: nil %>
+    </div>
+  </aside>
+
+  <section class="rounded-2xl border border-dashed border-slate-300 bg-white p-8">
+    <div class="mx-auto max-w-lg text-center">
+      <h2 class="text-xl font-semibold">Wähle einen Raum aus</h2>
+      <p class="mt-2 text-sm text-slate-600">
+        Öffne einen bestehenden Raum in der linken Spalte oder erstelle einen neuen, um den Realtime-Chat zu starten.
+      </p>
+    </div>
+  </section>
+</div>

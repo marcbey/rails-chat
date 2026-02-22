@@ -1,0 +1,28 @@
+/.bundle
+/log/*
+/tmp/*
+!/tmp/.keep
+!/tmp/pids
+!/tmp/pids/.keep
+/storage/*
+!/storage/.keep
+
+/config/master.key
+/.env
+/.env.*
+
+/node_modules
+/yarn-error.log
+
+/vendor/bundle
+
+# Terraform
+**/.terraform/*
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# macOS
+.DS_Store

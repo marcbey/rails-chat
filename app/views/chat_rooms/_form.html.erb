@@ -1,0 +1,16 @@
+<%= turbo_frame_tag "new_chat_room" do %>
+  <%= form_with model: chat_room, class: "space-y-2" do |f| %>
+    <div>
+      <%= f.label :name, "Neuer Raum", class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+      <%= f.text_field :name,
+        placeholder: "z. B. Team Allgemein",
+        class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+      <% if chat_room.errors[:name].any? %>
+        <p class="mt-1 text-xs text-rose-600"><%= chat_room.errors[:name].to_sentence %></p>
+      <% end %>
+    </div>
+
+    <%= f.submit "Raum erstellen",
+      class: "w-full rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-700" %>
+  <% end %>
+<% end %>

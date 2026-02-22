@@ -1,0 +1,12 @@
+<% active_room = local_assigns[:active_room] %>
+<% active = active_room == chat_room %>
+
+<%= link_to chat_room_path(chat_room),
+  id: dom_id(chat_room),
+  class: [
+    "block rounded-xl border px-3 py-2 transition",
+    (active ? "border-cyan-500 bg-cyan-50 text-cyan-900" : "border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/40")
+  ].join(" ") do %>
+  <p class="truncate text-sm font-semibold"><%= chat_room.name %></p>
+  <p class="text-xs text-slate-500"><%= l(chat_room.created_at, format: :short) %></p>
+<% end %>

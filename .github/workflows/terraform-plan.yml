@@ -1,0 +1,21 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+
+jobs:
+  plan-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init (staging)
+        run: terraform -chdir=infra/terraform/environments/staging init -backend=false
+
+      - name: Terraform plan (staging)
+        run: |
+          cp infra/terraform/environments/staging/terraform.tfvars.example infra/terraform/environments/staging/terraform.tfvars
+          terraform -chdir=infra/terraform/environments/staging plan -var="aws_account_id=882873537464" -var='ssh_public_key=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII2ZIBdrgX9vgxCz2WKMju/vi5+0bNTT0jbGkQXp35U6 marc@schopper.rocks'

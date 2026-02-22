@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "#{chat_room.messages_dom_id}_form" do %>
+  <%= form_with model: [chat_room, chat_message], class: "space-y-3" do |f| %>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <div class="sm:col-span-1">
+        <%= f.label :author_name, "Name", class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+        <%= f.text_field :author_name,
+          placeholder: "Dein Name",
+          class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+        <% if chat_message.errors[:author_name].any? %>
+          <p class="mt-1 text-xs text-rose-600"><%= chat_message.errors[:author_name].to_sentence %></p>
+        <% end %>
+      </div>
+
+      <div class="sm:col-span-2">
+        <%= f.label :body, "Nachricht", class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+        <%= f.text_area :body,
+          rows: 3,
+          placeholder: "Schreibe deine Nachricht...",
+          class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+        <% if chat_message.errors[:body].any? %>
+          <p class="mt-1 text-xs text-rose-600"><%= chat_message.errors[:body].to_sentence %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <%= f.submit "Senden",
+        class: "rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500" %>
+    </div>
+  <% end %>
+<% end %>

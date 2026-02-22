@@ -1,0 +1,6 @@
+servers:
+  web: <%= ENV.fetch("PRODUCTION_WEB_HOSTS", ENV.fetch("KAMAL_WEB_HOSTS", "")).split(",").map(&:strip).reject(&:empty?) %>
+
+env:
+  clear:
+    APP_ENV: production

@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${1:-up}"
+
+case "$cmd" in
+  up)
+    docker compose up --build
+    ;;
+  down)
+    docker compose down
+    ;;
+  logs)
+    docker compose logs -f --tail=200
+    ;;
+  console)
+    docker compose run --rm web bin/rails console
+    ;;
+  dbprepare)
+    docker compose run --rm web bin/rails db:prepare
+    ;;
+  rspec)
+    docker compose run --rm web bundle exec rspec
+    ;;
+  *)
+    echo "Usage: $0 {up|down|logs|console|dbprepare|rspec}"
+    exit 1
+    ;;
+esac
