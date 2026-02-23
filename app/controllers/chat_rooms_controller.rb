@@ -10,7 +10,8 @@ class ChatRoomsController < ApplicationController
     @chat_rooms = ChatRoom.order(created_at: :desc)
     @chat_room_form = ChatRoom.new
     @chat_message = @chat_room.chat_messages.build
-    @chat_messages = @chat_room.chat_messages.order(:created_at)
+    @chat_messages = @chat_room.chat_messages.includes(:user).order(:created_at)
+    @chat_room_membership = @chat_room.membership_for(current_user)
   end
 
   def new

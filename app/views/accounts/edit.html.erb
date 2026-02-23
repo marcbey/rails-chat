@@ -1,0 +1,57 @@
+<section class="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+  <header class="mb-6">
+    <h1 class="text-2xl font-semibold text-slate-900">Account</h1>
+    <p class="mt-1 text-sm text-slate-600">Manage username, password, and your bot character.</p>
+  </header>
+
+  <%= form_with model: @user, url: account_path, method: :patch, class: "space-y-5" do |f| %>
+    <div>
+      <%= f.label :username, class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+      <%= f.text_field :username,
+        required: true,
+        autocomplete: "username",
+        class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+      <% if @user.errors[:username].any? %>
+        <p class="mt-1 text-xs text-rose-600"><%= @user.errors[:username].to_sentence %></p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= f.label :bot_character, "Bot character", class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+      <%= f.text_area :bot_character,
+        rows: 8,
+        placeholder: "Describe how your bot should answer in chat.",
+        class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+      <% if @user.errors[:bot_character].any? %>
+        <p class="mt-1 text-xs text-rose-600"><%= @user.errors[:bot_character].to_sentence %></p>
+      <% end %>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <%= f.label :password, class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+        <%= f.password_field :password,
+          autocomplete: "new-password",
+          maxlength: 72,
+          class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, class: "mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600" %>
+        <%= f.password_field :password_confirmation,
+          autocomplete: "new-password",
+          maxlength: 72,
+          class: "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-cyan-500 transition focus:border-cyan-500 focus:ring-2" %>
+      </div>
+    </div>
+
+    <% if @user.errors[:password].any? %>
+      <p class="text-xs text-rose-600"><%= @user.errors[:password].to_sentence %></p>
+    <% end %>
+
+    <div class="flex justify-end">
+      <%= f.submit "Save account",
+        class: "rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-500" %>
+    </div>
+  <% end %>
+</section>

@@ -1,7 +1,12 @@
-<article id="<%= dom_id(chat_message) %>" class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+<article
+  id="<%= dom_id(chat_message) %>"
+  class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+  data-chat-message-id="<%= chat_message.id %>"
+  data-chat-message-author-username="<%= chat_message.user.username %>"
+>
   <header class="mb-1 flex items-center justify-between gap-2">
-    <p class="text-sm font-semibold text-slate-900"><%= chat_message.author_name %></p>
+    <p class="text-sm font-semibold text-slate-900"><%= chat_message.user.username %></p>
     <time class="text-xs text-slate-500"><%= l(chat_message.created_at, format: :short) %></time>
   </header>
-  <p class="whitespace-pre-wrap break-words text-sm text-slate-700"><%= chat_message.body %></p>
+  <p data-chat-message-body class="whitespace-pre-wrap break-words text-sm text-slate-700"><%= chat_message.body %></p>
 </article>

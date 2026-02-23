@@ -21,6 +21,19 @@
 
   <body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
     <div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+      <% if authenticated? %>
+        <nav class="mb-4 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <div class="text-sm text-slate-700">
+            Signed in as <span class="font-semibold"><%= current_user.username %></span>
+          </div>
+          <div class="flex items-center gap-3 text-sm">
+            <%= link_to "Chat", root_path, class: "font-medium text-cyan-700 hover:text-cyan-600" %>
+            <%= link_to "Account", edit_account_path, class: "font-medium text-cyan-700 hover:text-cyan-600" %>
+            <%= button_to "Sign out", session_path, method: :delete, class: "rounded-lg border border-slate-300 px-3 py-1.5 text-slate-700 hover:bg-slate-50" %>
+          </div>
+        </nav>
+      <% end %>
+
       <% if notice.present? %>
         <div class="mb-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           <%= notice %>

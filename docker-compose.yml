@@ -29,6 +29,8 @@ services:
       POSTGRES_DB_DEVELOPMENT_CACHE: rails_chat_development_cache
       POSTGRES_DB_DEVELOPMENT_QUEUE: rails_chat_development_queue
       POSTGRES_DB_DEVELOPMENT_CABLE: rails_chat_development_cable
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_REALTIME_MODEL: ${OPENAI_REALTIME_MODEL:-gpt-realtime-mini}
     command: bin/dev
     ports:
       - "3000:3000"

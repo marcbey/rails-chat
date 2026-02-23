@@ -2,6 +2,8 @@ class ChatRoom < ApplicationRecord
   include ActionView::RecordIdentifier
 
   has_many :chat_messages, dependent: :destroy
+  has_many :chat_room_memberships, dependent: :destroy
+  has_many :users, through: :chat_room_memberships
 
   before_validation :assign_slug
 
@@ -16,6 +18,10 @@ class ChatRoom < ApplicationRecord
 
   def messages_dom_id
     "#{dom_id(self)}_messages"
+  end
+
+  def membership_for(user)
+    chat_room_memberships.find_or_create_by!(user: user)
   end
 
   private

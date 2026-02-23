@@ -3,6 +3,7 @@ class ChatMessagesController < ApplicationController
 
   def create
     @chat_message = @chat_room.chat_messages.build(chat_message_params)
+    @chat_message.user = current_user
 
     respond_to do |format|
       if @chat_message.save
@@ -24,8 +25,9 @@ class ChatMessagesController < ApplicationController
         end
         format.html do
           @chat_rooms = ChatRoom.order(created_at: :desc)
-          @chat_messages = @chat_room.chat_messages.order(:created_at)
+          @chat_messages = @chat_room.chat_messages.includes(:user).order(:created_at)
           @chat_room_form = ChatRoom.new
+          @chat_room_membership = @chat_room.membership_for(current_user)
           render "chat_rooms/show", status: :unprocessable_entity
         end
       end
@@ -39,7 +41,7 @@ class ChatMessagesController < ApplicationController
   end
 
   def chat_message_params
-    params.require(:chat_message).permit(:author_name, :body)
+    params.require(:chat_message).permit(:body)
   end
 
   def message_form_dom_id

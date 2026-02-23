@@ -21,6 +21,15 @@ mise exec -- bin/dev
 
 App läuft dann auf [http://localhost:3000](http://localhost:3000).
 
+### Login in Development
+
+Beim Seeding wird automatisch ein Demo-User angelegt:
+
+- Username: `demo`
+- Passwort: `password123!`
+
+Du kannst die Werte mit `SEED_USERNAME` und `SEED_PASSWORD` überschreiben.
+
 ## Lokale Entwicklung (mit Docker)
 
 1. `.env.example` kopieren und bei Bedarf anpassen.
@@ -49,6 +58,24 @@ bin/docker-dev rspec
 - Realtime: Solid Cable (DB-basiert)
 - Jobs im Web-Prozess: `:async` (kein Solid Queue Supervisor in Puma)
 - Ingress (AWS): ALB -> kamal-proxy -> Puma
+
+## Auth & Bot
+
+- Authentifizierung mit Rails-Standardgenerator (Session-basiert).
+- Login über `username + password`.
+- Account-Seite unter `/account` mit:
+  - `username`
+  - `password`
+  - `bot_character`
+- Nachrichten-Autor wird serverseitig aus `current_user.username` gesetzt.
+- Bot-Antworten sind pro User und pro Chat-Raum ein-/ausschaltbar.
+- Bot antwortet nur auf Nachrichten mit `@username`-Mention.
+- Bot-Streaming läuft browserseitig in Echtzeit über OpenAI Realtime API und streamt Tokens live in das Message-Formular, danach Auto-Submit.
+
+Benötigte ENV-Variablen:
+
+- `OPENAI_API_KEY`
+- `OPENAI_REALTIME_MODEL` (Default: `gpt-realtime-mini`)
 
 ## Tests und Qualität
 
@@ -84,6 +111,8 @@ Erwartete GitHub Secrets:
 - `DATABASE_URL_PRODUCTION`
 - `SECRET_KEY_BASE_STAGING`
 - `SECRET_KEY_BASE_PRODUCTION`
+- `OPENAI_API_KEY_STAGING`
+- `OPENAI_API_KEY_PRODUCTION`
 
 Hinweis: `KAMAL_REGISTRY_PASSWORD` wird zur Laufzeit aus AWS ECR geholt und ist kein statisches Secret.
 Hinweis: `KAMAL_SSH_KNOWN_HOSTS`, `ALLOWED_HOSTS` und `ALLOWED_CABLE_ORIGINS` werden in den Deploy-Workflows automatisch aus AWS-Ressourcen ermittelt.

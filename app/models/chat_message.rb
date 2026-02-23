@@ -1,7 +1,7 @@
 class ChatMessage < ApplicationRecord
   belongs_to :chat_room
+  belongs_to :user
 
-  validates :author_name, presence: true, length: { in: 2..40 }
   validates :body, presence: true, length: { maximum: 2000 }
 
   after_create_commit :broadcast_new_message

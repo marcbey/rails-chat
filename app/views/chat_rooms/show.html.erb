@@ -17,10 +17,32 @@
     </div>
   </aside>
 
-  <section class="flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white">
+  <section
+    class="flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white"
+    data-controller="chat-bot"
+    data-chat-bot-messages-container-id-value="<%= @chat_room.messages_dom_id %>"
+    data-chat-bot-current-username-value="<%= current_user.username %>"
+    data-chat-bot-enabled-value="<%= @chat_room_membership.bot_enabled? %>"
+    data-chat-bot-session-path-value="<%= chat_room_bot_reply_session_path(@chat_room) %>"
+    data-chat-bot-context-limit-value="20"
+  >
     <header class="border-b border-slate-200 px-6 py-4">
-      <h2 class="text-xl font-semibold"><%= @chat_room.name %></h2>
-      <p class="text-sm text-slate-500">Realtime Nachrichten mit Hotwire & Turbo Streams</p>
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-semibold"><%= @chat_room.name %></h2>
+          <p class="text-sm text-slate-500">Realtime Nachrichten mit Hotwire & Turbo Streams</p>
+        </div>
+
+        <%= form_with url: chat_room_bot_setting_path(@chat_room), method: :patch do |f| %>
+          <%= hidden_field_tag :bot_enabled, @chat_room_membership.bot_enabled? ? false : true %>
+          <%= f.submit(
+            @chat_room_membership.bot_enabled? ? "Bot deaktivieren" : "Bot aktivieren",
+            class: @chat_room_membership.bot_enabled? ?
+              "rounded-xl border border-rose-300 bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100" :
+              "rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+          ) %>
+        <% end %>
+      </div>
     </header>
 
     <div class="flex-1 overflow-y-auto px-6 py-4">

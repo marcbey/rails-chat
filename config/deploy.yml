@@ -14,10 +14,12 @@ env:
     RAILS_ENV: production
     ALLOWED_HOSTS: <%= ENV.fetch("ALLOWED_HOSTS", "") %>
     ALLOWED_CABLE_ORIGINS: <%= ENV.fetch("ALLOWED_CABLE_ORIGINS", "") %>
+    OPENAI_REALTIME_MODEL: <%= ENV.fetch("OPENAI_REALTIME_MODEL", "gpt-realtime-mini") %>
   secret:
     - RAILS_MASTER_KEY
     - DATABASE_URL
     - SECRET_KEY_BASE
+    - OPENAI_API_KEY
 
 asset_path: /rails/public/assets
 

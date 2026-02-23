@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session, only: %i[new create destroy]
+  resource :account, only: %i[edit update]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -13,5 +15,7 @@ Rails.application.routes.draw do
 
   resources :chat_rooms, only: %i[index show new create] do
     resources :chat_messages, only: :create
+    resource :bot_setting, only: :update, controller: "chat_room_bot_settings"
+    resource :bot_reply_session, only: :create, controller: "chat_room_bot_reply_sessions"
   end
 end
