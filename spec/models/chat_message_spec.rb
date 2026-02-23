@@ -30,4 +30,11 @@ RSpec.describe ChatMessage, type: :model do
 
     expect(message).to be_valid
   end
+
+  it "limits body length to 2000 characters" do
+    message = chat_room.chat_messages.build(user: user, body: "x" * 2001)
+
+    expect(message).not_to be_valid
+    expect(message.errors[:body]).to be_present
+  end
 end

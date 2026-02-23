@@ -72,7 +72,7 @@ bin/docker-dev rspec
   - `bot_character`
 - Nachrichten-Autor wird serverseitig aus `current_user.username` gesetzt.
 - Bot-Antworten sind pro User und pro Chat-Raum ein-/ausschaltbar.
-- Bot antwortet nur auf Nachrichten mit `@username`-Mention.
+- Bot-Trigger hängt von Raumgröße und Mention ab (siehe Matrix unten).
 - Bot-Streaming läuft browserseitig in Echtzeit über OpenAI Realtime API und streamt Tokens live in das Message-Formular, danach Auto-Submit.
 
 Benötigte ENV-Variablen:
@@ -85,6 +85,55 @@ Für Passwort-Reset in Staging/Production:
 - `APP_HOST` (wird im Deploy-Workflow automatisch gesetzt)
 - funktionierende Mailer-Konfiguration (SMTP/Provider)
 
+### Bot Trigger-Regeln
+
+| Bedingung | Ergebnis |
+| --- | --- |
+| Bot im Raum deaktiviert | Keine automatische Antwort |
+| Bot aktiviert, Raum mit genau 2 Teilnehmern | Bot antwortet auf jede eingehende Nachricht des anderen Teilnehmers (kein `@username` nötig) |
+| Bot aktiviert, Raum mit 3+ Teilnehmern | Bot antwortet nur auf Nachrichten mit `@username`-Mention |
+| Nachricht stammt vom selben User | Keine automatische Selbst-Antwort |
+
+### Realtime Ablauf (Kurz)
+
+1. Browser erkennt eine neue eingehende Chat-Nachricht per DOM-Mutation (Turbo Stream Update).
+2. Stimulus-Controller prüft Bot-Status und Trigger-Regel (2er-Raum vs. Mention).
+3. Browser holt über `POST /chat_rooms/:chat_room_id/bot_reply_session` ein kurzlebiges OpenAI Realtime Client Secret.
+4. Browser baut WebRTC Data-Channel zu OpenAI Realtime auf und sendet Prompt + Kontext.
+5. Token-Streams werden live in das Nachrichten-Formular geschrieben.
+6. Nach `response.completed` wird das Formular automatisch abgeschickt.
+
+### OpenAI Key nach Umgebung bereitstellen
+
+`develop` (lokal):
+
+```bash
+cp .env.example .env
+echo 'OPENAI_API_KEY=YOUR_KEY' >> .env
+echo 'OPENAI_REALTIME_MODEL=gpt-realtime-mini' >> .env
+```
+
+`staging` und `production` (GitHub Environments):
+
+```bash
+gh secret set OPENAI_API_KEY_STAGING --env staging --body "$OPENAI_API_KEY"
+gh secret set OPENAI_API_KEY_PRODUCTION --env production --body "$OPENAI_API_KEY"
+```
+
+Hinweise:
+
+- API Keys niemals im Repository speichern.
+- Deploy-Workflows schreiben `OPENAI_API_KEY` zur Laufzeit in `.kamal/secrets-common`.
+- Staging deployt automatisch bei Push auf `main`; Production manuell.
+
+### Bot Troubleshooting
+
+- `403 Forbidden` bei `bot_reply_session`: Bot ist im aktuellen Raum für den User deaktiviert.
+- `503 Missing OPENAI_API_KEY configuration`: Key ist in der Zielumgebung nicht gesetzt.
+- `502 Failed to initialize realtime bot session`: OpenAI-Realtime-Init fehlgeschlagen (Upstream/Key/Model prüfen).
+- Bot antwortet in Gruppenraum nicht: Nachricht enthält kein `@username`.
+- Bot antwortet in 2er-Raum nicht: Prüfen, ob wirklich genau zwei Mitgliedschaften für den Raum bestehen.
+
 ## Tests und Qualität
 
 ```bash
@@ -92,6 +141,14 @@ mise exec -- bundle exec rspec
 mise exec -- bundle exec rubocop
 mise exec -- bundle exec brakeman --no-pager
 mise exec -- bundle exec bundler-audit check --update
+```
+
+Gezielte Testläufe:
+
+```bash
+mise exec -- bundle exec rspec spec/requests/chat_room_bot_reply_sessions_spec.rb
+mise exec -- bundle exec rspec spec/requests/chat_messages_spec.rb
+mise exec -- bundle exec rspec spec/models/chat_message_spec.rb
 ```
 
 ## GitHub Actions
