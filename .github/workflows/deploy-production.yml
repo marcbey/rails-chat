@@ -90,6 +90,8 @@ jobs:
           echo "RUNNER_SSH_CIDR=${RUNNER_PUBLIC_IP}/32" >> "$GITHUB_ENV"
           echo "ALLOWED_HOSTS=${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
           echo "ALLOWED_CABLE_ORIGINS=https://${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
+          echo "APP_HOST=${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
+          echo "APP_PROTOCOL=https" >> "$GITHUB_ENV"
 
       - name: Temporarily allow SSH from runner
         run: |

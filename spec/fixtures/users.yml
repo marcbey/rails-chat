@@ -4,10 +4,12 @@
 
 one:
   username: one_user
+  email_address: one@example.com
   bot_character: ""
   password_digest: <%= password_digest %>
 
 two:
   username: two_user
+  email_address: two@example.com
   bot_character: ""
   password_digest: <%= password_digest %>

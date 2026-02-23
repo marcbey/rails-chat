@@ -63,8 +63,11 @@ bin/docker-dev rspec
 
 - Authentifizierung mit Rails-Standardgenerator (Session-basiert).
 - Login über `username + password`.
+- Registrierung über `/registration/new`.
+- Passwort-Reset über `/passwords/new` (E-Mail-Link).
 - Account-Seite unter `/account` mit:
   - `username`
+  - `email_address`
   - `password`
   - `bot_character`
 - Nachrichten-Autor wird serverseitig aus `current_user.username` gesetzt.
@@ -76,6 +79,11 @@ Benötigte ENV-Variablen:
 
 - `OPENAI_API_KEY`
 - `OPENAI_REALTIME_MODEL` (Default: `gpt-realtime-mini`)
+
+Für Passwort-Reset in Staging/Production:
+
+- `APP_HOST` (wird im Deploy-Workflow automatisch gesetzt)
+- funktionierende Mailer-Konfiguration (SMTP/Provider)
 
 ## Tests und Qualität
 

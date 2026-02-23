@@ -2,7 +2,14 @@ require "rails_helper"
 
 RSpec.describe ChatMessage, type: :model do
   let(:chat_room) { ChatRoom.create!(name: "General") }
-  let(:user) { User.create!(username: "marc", password: "password123!", password_confirmation: "password123!") }
+  let(:user) do
+    User.create!(
+      username: "marc",
+      email_address: "marc@example.com",
+      password: "password123!",
+      password_confirmation: "password123!"
+    )
+  end
 
   it "requires a user" do
     message = chat_room.chat_messages.build(body: "Hello")

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "ChatRooms", type: :request do
   let(:user_password) { "password123!" }
-  let(:user) { User.create!(username: "marc", password: user_password, password_confirmation: user_password) }
+  let(:user) { User.create!(username: "marc", email_address: "marc@example.com", password: user_password, password_confirmation: user_password) }
 
   describe "GET /" do
     it "redirects to sign in when unauthenticated" do

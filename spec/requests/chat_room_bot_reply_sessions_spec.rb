@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "ChatRoomBotReplySessions", type: :request do
   let(:password) { "password123!" }
-  let(:user) { User.create!(username: "marc", password: password, password_confirmation: password) }
+  let(:user) { User.create!(username: "marc", email_address: "marc@example.com", password: password, password_confirmation: password) }
   let(:chat_room) { ChatRoom.create!(name: "General") }
 
   describe "POST /chat_rooms/:chat_room_id/bot_reply_session" do

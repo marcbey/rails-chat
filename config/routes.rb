@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
+  resource :registration, only: %i[new create]
+  resources :passwords, only: %i[new create edit update], param: :token
   resource :account, only: %i[edit update]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

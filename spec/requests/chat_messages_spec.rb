@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "ChatMessages", type: :request do
   let(:user_password) { "password123!" }
-  let(:user) { User.create!(username: "marc", password: user_password, password_confirmation: user_password) }
+  let(:user) { User.create!(username: "marc", email_address: "marc@example.com", password: user_password, password_confirmation: user_password) }
 
   describe "POST /chat_rooms/:chat_room_id/chat_messages" do
     it "creates a message and redirects" do

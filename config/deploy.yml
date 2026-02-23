@@ -14,6 +14,8 @@ env:
     RAILS_ENV: production
     ALLOWED_HOSTS: <%= ENV.fetch("ALLOWED_HOSTS", "") %>
     ALLOWED_CABLE_ORIGINS: <%= ENV.fetch("ALLOWED_CABLE_ORIGINS", "") %>
+    APP_HOST: <%= ENV.fetch("APP_HOST", "") %>
+    APP_PROTOCOL: <%= ENV.fetch("APP_PROTOCOL", "https") %>
     OPENAI_REALTIME_MODEL: <%= ENV.fetch("OPENAI_REALTIME_MODEL", "gpt-realtime-mini") %>
   secret:
     - RAILS_MASTER_KEY

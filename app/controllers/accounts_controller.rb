@@ -16,7 +16,7 @@ class AccountsController < ApplicationController
   private
 
   def account_params
-    permitted = params.require(:user).permit(:username, :bot_character, :password, :password_confirmation)
+    permitted = params.require(:user).permit(:username, :email_address, :bot_character, :password, :password_confirmation)
     return permitted if permitted[:password].present?
 
     permitted.except(:password, :password_confirmation)

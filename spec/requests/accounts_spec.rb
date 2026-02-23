@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Account", type: :request do
   let(:password) { "password123!" }
-  let(:user) { User.create!(username: "marc", password: password, password_confirmation: password) }
+  let(:user) { User.create!(username: "marc", email_address: "marc@example.com", password: password, password_confirmation: password) }
 
   describe "GET /account/edit" do
     it "renders for authenticated users" do
@@ -22,12 +22,14 @@ RSpec.describe "Account", type: :request do
       patch account_path, params: {
         user: {
           username: "marc_new",
+          email_address: "marc_new@example.com",
           bot_character: "Antworte freundlich."
         }
       }
 
       expect(response).to redirect_to(edit_account_path)
       expect(user.reload.username).to eq("marc_new")
+      expect(user.email_address).to eq("marc_new@example.com")
       expect(user.bot_character).to eq("Antworte freundlich.")
     end
   end
