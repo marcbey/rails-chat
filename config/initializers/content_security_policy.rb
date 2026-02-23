@@ -15,9 +15,9 @@ Rails.application.configure do
     policy.img_src :self, :https, :data
     policy.script_src :self, :https
     policy.style_src :self, :https
-    policy.connect_src :self, :https, :wss, :ws
+    policy.connect_src :self, :https, :wss
   end
 
-  config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
+  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src style-src]
 end

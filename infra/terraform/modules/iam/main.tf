@@ -53,9 +53,15 @@ data "aws_iam_policy_document" "github_actions_deploy_permissions" {
   }
 
   statement {
-    sid       = "ReadInfrastructureDiscoveryData"
-    effect    = "Allow"
-    actions   = ["ec2:DescribeInstances", "elasticloadbalancing:DescribeLoadBalancers"]
+    sid    = "ReadInfrastructureDiscoveryData"
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeSecurityGroups",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:RevokeSecurityGroupIngress",
+      "elasticloadbalancing:DescribeLoadBalancers"
+    ]
     resources = ["*"]
   }
 }

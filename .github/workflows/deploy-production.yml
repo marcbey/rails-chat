@@ -45,6 +45,7 @@ jobs:
           set -euo pipefail
 
           INSTANCE_TAG="rails-chat-production-web"
+          WEB_SG_NAME="rails-chat-production-web-sg"
           PUBLIC_HOSTNAME="chat.schopp3r.de"
 
           WEB_HOSTS=""
@@ -67,9 +68,43 @@ jobs:
             exit 1
           fi
 
+          WEB_SG_ID="$(aws ec2 describe-security-groups \
+            --region "${{ secrets.AWS_REGION }}" \
+            --filters "Name=group-name,Values=${WEB_SG_NAME}" \
+            --query 'SecurityGroups[0].GroupId' \
+            --output text)"
+
+          if [ -z "${WEB_SG_ID}" ] || [ "${WEB_SG_ID}" = "None" ]; then
+            echo "No security group found with name: ${WEB_SG_NAME}"
+            exit 1
+          fi
+
+          RUNNER_PUBLIC_IP="$(curl -sS https://checkip.amazonaws.com | tr -d '\n')"
+          if [ -z "${RUNNER_PUBLIC_IP}" ]; then
+            echo "Could not determine runner public IP"
+            exit 1
+          fi
+
           echo "KAMAL_WEB_HOSTS=${WEB_HOSTS}" >> "$GITHUB_ENV"
+          echo "WEB_SG_ID=${WEB_SG_ID}" >> "$GITHUB_ENV"
+          echo "RUNNER_SSH_CIDR=${RUNNER_PUBLIC_IP}/32" >> "$GITHUB_ENV"
           echo "ALLOWED_HOSTS=${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
           echo "ALLOWED_CABLE_ORIGINS=https://${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
+
+      - name: Temporarily allow SSH from runner
+        run: |
+          set -euo pipefail
+          set +e
+          OUTPUT=$(aws ec2 authorize-security-group-ingress \
+            --region "${{ secrets.AWS_REGION }}" \
+            --group-id "${WEB_SG_ID}" \
+            --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=${RUNNER_SSH_CIDR},Description=GitHubActionsTempSSH}]" 2>&1)
+          STATUS=$?
+          set -e
+          if [ $STATUS -ne 0 ] && ! echo "${OUTPUT}" | grep -q "InvalidPermission.Duplicate"; then
+            echo "${OUTPUT}"
+            exit $STATUS
+          fi
 
       - name: Setup SSH key for Kamal
         run: |
@@ -112,3 +147,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PRODUCTION }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE_PRODUCTION }}
         run: bundle exec kamal deploy -d production --skip-push --version "${GITHUB_SHA}"
+
+      - name: Revoke temporary SSH from runner
+        if: always()
+        run: |
+          set -euo pipefail
+          aws ec2 revoke-security-group-ingress \
+            --region "${{ secrets.AWS_REGION }}" \
+            --group-id "${WEB_SG_ID}" \
+            --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=${RUNNER_SSH_CIDR}}]" || true
