@@ -45,8 +45,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          LB_NAME="rails-chat-staging-alb"
           INSTANCE_TAG="rails-chat-staging-web"
+          PUBLIC_HOSTNAME="chat-staging.schopp3r.de"
 
           WEB_HOSTS=""
           for _ in $(seq 1 30); do
@@ -68,20 +68,9 @@ jobs:
             exit 1
           fi
 
-          ALB_DNS="$(aws elbv2 describe-load-balancers \
-            --region "${{ secrets.AWS_REGION }}" \
-            --names "${LB_NAME}" \
-            --query 'LoadBalancers[0].DNSName' \
-            --output text)"
-
-          if [ -z "${ALB_DNS}" ] || [ "${ALB_DNS}" = "None" ]; then
-            echo "Could not resolve ALB DNS name for ${LB_NAME}"
-            exit 1
-          fi
-
           echo "KAMAL_WEB_HOSTS=${WEB_HOSTS}" >> "$GITHUB_ENV"
-          echo "ALLOWED_HOSTS=${ALB_DNS}" >> "$GITHUB_ENV"
-          echo "ALLOWED_CABLE_ORIGINS=http://${ALB_DNS}" >> "$GITHUB_ENV"
+          echo "ALLOWED_HOSTS=${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
+          echo "ALLOWED_CABLE_ORIGINS=https://${PUBLIC_HOSTNAME}" >> "$GITHUB_ENV"
 
       - name: Setup SSH key for Kamal
         run: |

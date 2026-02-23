@@ -13,3 +13,13 @@ variable "public_subnet_ids" {
 variable "alb_sg_id" {
   type = string
 }
+
+variable "enable_https" {
+  type    = bool
+  default = false
+}
+
+variable "certificate_arn" {
+  type    = string
+  default = null
+}

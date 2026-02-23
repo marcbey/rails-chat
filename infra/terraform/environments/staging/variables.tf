@@ -80,3 +80,11 @@ variable "github_repo" {
 variable "aws_account_id" {
   type = string
 }
+
+variable "public_hostname" {
+  type = string
+}
+
+variable "acm_certificate_arn" {
+  type = string
+}

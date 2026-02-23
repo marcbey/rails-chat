@@ -20,7 +20,10 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 1. Datenbank: PostgreSQL 18.x (aktueller Major-Release-Zweig, jeweils neuester in RDS verfügbarer 18.x-Patchstand)
 2. Umgebungen: `staging` und `production`
 3. AWS Region: `eu-central-1`
-4. Aktuell kein Domain-/SSL-Setup (nur HTTP über ALB)
+4. Domain/SSL-Setup:
+- `chat-staging.schopp3r.de` fuer `staging`
+- `chat.schopp3r.de` fuer `production`
+- HTTPS via AWS ACM + ALB (TLS-Termination auf ALB)
 5. CI/CD über GitHub Actions
 6. Test-Stack: RSpec
 7. Deployment auf mehreren Hosts
@@ -62,7 +65,8 @@ Diese Entscheidungen sind final und werden ohne weitere Rückfragen umgesetzt:
 
 ### 3.4 Ingress-Details
 
-- ALB Listener: `80`
+- ALB Listener: `80` + `443`
+- `80` redirectet auf `443`
 - Target Group: kamal-proxy auf Web-Hosts
 - Healthcheck: `GET /up`
 - Idle Timeout: `300s`
@@ -314,16 +318,65 @@ Jeder Environment-Ordner enthält:
 - Staging: automatisch per `deploy-staging.yml`
 - Production: manuell per `deploy-production.yml`
 
-## 10. Teststrategie (RSpec)
+## 10. SSL/HTTPS + Domain-Plan (HostEurope + AWS ACM)
 
-### 10.1 Testtypen
+### 10.1 Ziel-Hostnames
+
+- `staging`: `chat-staging.schopp3r.de`
+- `production`: `chat.schopp3r.de`
+
+### 10.2 AWS-seitig
+
+1. Je Environment ein ACM-Zertifikat in `eu-central-1` erstellen:
+- `chat-staging.schopp3r.de`
+- `chat.schopp3r.de`
+2. Terraform erweitert ALB um:
+- HTTPS Listener `443` mit jeweiligem ACM Zertifikat
+- HTTP Listener `80` als Redirect auf HTTPS
+3. Security Group ALB erlaubt `80` und `443`
+4. Environment-Variablen fuer Rails/Kamal:
+- `PUBLIC_HOSTNAME` je Environment
+- `ALLOWED_HOSTS` = jeweiliger Public Hostname
+- `ALLOWED_CABLE_ORIGINS` = `https://<public-hostname>`
+5. `production` setzt `force_ssl = true`
+
+### 10.3 HostEurope-seitig (konkrete DNS-Eintraege)
+
+Bei HostEurope DNS folgende CNAME-Records anlegen:
+
+- `chat-staging` -> `<staging-alb-dns-name>`
+- `chat` -> `<production-alb-dns-name>`
+
+Zusätzlich fuer ACM DNS-Validierung je Zertifikat die von ACM vorgegebenen CNAME-Validation-Records anlegen:
+
+- Name: `_xxxx.chat-staging.schopp3r.de`
+- Wert: `_yyyy.acm-validations.aws`
+- Name: `_aaaa.chat.schopp3r.de`
+- Wert: `_bbbb.acm-validations.aws`
+
+### 10.4 Rollout-Reihenfolge
+
+1. Staging DNS + Zertifikat + Terraform + Deploy + Test
+2. Production DNS + Zertifikat + Terraform + manueller Deploy + Test
+
+### 10.5 Abnahme SSL
+
+1. `http://chat-staging.schopp3r.de` redirectet auf HTTPS
+2. `https://chat-staging.schopp3r.de` liefert gueltiges Zertifikat
+3. `http://chat.schopp3r.de` redirectet auf HTTPS
+4. `https://chat.schopp3r.de` liefert gueltiges Zertifikat
+5. Realtime Chat funktioniert unter HTTPS (Turbo/Action Cable)
+
+## 11. Teststrategie (RSpec)
+
+### 11.1 Testtypen
 
 1. Model Specs
 2. Request Specs
 3. System Specs (Turbo Flows)
 4. Broadcast Specs (Rooms + Messages)
 
-### 10.2 Mindestfälle
+### 11.2 Mindestfaelle
 
 - Raum erstellen -> sofortiger Broadcast in Room-Liste
 - Message erstellen -> sofortiger Broadcast im Raum
@@ -331,7 +384,7 @@ Jeder Environment-Ordner enthält:
 - HTML Fallback ohne Turbo funktioniert
 - Nachrichtenreihenfolge nach `created_at ASC`
 
-## 11. Security und Betriebs-Baseline
+## 12. Security und Betriebs-Baseline
 
 - DB nur intern erreichbar
 - Least-Privilege IAM/SG
@@ -339,7 +392,7 @@ Jeder Environment-Ordner enthält:
 - Input-Limits + Sanitizing für Chat-Eingaben
 - Basis-Logging für App und Infra
 
-## 12. Umsetzungsreihenfolge (ohne Rückfragen)
+## 13. Umsetzungsreihenfolge (ohne Rueckfragen)
 
 ### Phase 0: Bootstrap
 
@@ -375,12 +428,28 @@ Jeder Environment-Ordner enthält:
 - Staging/Production Infrastruktur
 - Kamal auf Multi-Host verifizieren
 
-### Phase 6: Abnahme
+### Phase 6: SSL/HTTPS
+
+- ACM Zertifikate + DNS Validation
+- ALB HTTPS Listener + HTTP Redirect
+- Rails Host/Cable/SSL-Config pro Environment
+
+### Phase 7: Abnahme
 
 - End-to-End Smoke Tests
 - Dokumentation final
 
-## 13. Definition of Done
+## 14. Eingaben vom Benutzer (einmalig notwendig)
+
+Fuer die Umsetzung werden nur noch folgende Inputs benoetigt:
+
+1. Zugriff auf HostEurope DNS-Verwaltung (du trägst dort CNAMEs ein)
+2. ALB DNS Namen aus Terraform Outputs:
+- Staging ALB DNS
+- Production ALB DNS (sobald production aufgebaut ist)
+3. ACM Validation CNAMEs (liefert AWS; du trägst sie bei HostEurope ein)
+
+## 15. Definition of Done
 
 Die Umsetzung gilt als abgeschlossen, wenn alle Punkte erfüllt sind:
 
@@ -393,6 +462,6 @@ Die Umsetzung gilt als abgeschlossen, wenn alle Punkte erfüllt sind:
 7. Kamal deployed erfolgreich auf mehrere Hosts je Umgebung
 8. README enthält vollständige Setup-/Deploy-/Betriebsanleitung
 
-## 14. Keine offenen Fragen
+## 16. Keine offenen Fragen
 
 Dieses Planungsdokument ist vollständig und ausreichend konkretisiert, um die Applikation ohne weitere Rückfragen komplett umzusetzen.
