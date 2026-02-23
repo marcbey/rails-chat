@@ -86,18 +86,17 @@ Erwartete GitHub Secrets:
 - `SECRET_KEY_BASE_PRODUCTION`
 
 Hinweis: `KAMAL_REGISTRY_PASSWORD` wird zur Laufzeit aus AWS ECR geholt und ist kein statisches Secret.
+Hinweis: `KAMAL_SSH_KNOWN_HOSTS`, `ALLOWED_HOSTS` und `ALLOWED_CABLE_ORIGINS` werden in den Deploy-Workflows automatisch aus AWS-Ressourcen ermittelt.
 
 Environment `staging`:
 
 - `AWS_ROLE_ARN`
 - `ECR_IMAGE_NAME`
-- `STAGING_WEB_HOSTS`
 
 Environment `production`:
 
 - `AWS_ROLE_ARN`
 - `ECR_IMAGE_NAME`
-- `PRODUCTION_WEB_HOSTS`
 
 ## Terraform
 
@@ -126,6 +125,8 @@ cp terraform.tfvars.example terraform.tfvars
 terraform init -backend-config=backend.hcl.example
 terraform plan
 ```
+
+Hinweis: `ssh_ingress_cidrs` ist standardmäßig leer. Für SSH/Kamal muss explizit mindestens ein erlaubter CIDR gesetzt werden.
 
 Hinweis: In diesem Projekt ist `terraform apply` bewusst noch nicht automatisiert.
 

@@ -41,12 +41,69 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Discover runtime deploy targets
+        run: |
+          set -euo pipefail
+
+          LB_NAME="rails-chat-staging-alb"
+          INSTANCE_TAG="rails-chat-staging-web"
+
+          WEB_HOSTS=""
+          for _ in $(seq 1 30); do
+            WEB_HOSTS="$(aws ec2 describe-instances \
+              --region "${{ secrets.AWS_REGION }}" \
+              --filters "Name=tag:Name,Values=${INSTANCE_TAG}" "Name=instance-state-name,Values=running" \
+              --query 'Reservations[].Instances[].PublicIpAddress' \
+              --output text | tr '\t' '\n' | sed '/^$/d' | sort -u | paste -sd, -)"
+
+            if [ -n "${WEB_HOSTS}" ]; then
+              break
+            fi
+
+            sleep 10
+          done
+
+          if [ -z "${WEB_HOSTS}" ]; then
+            echo "No running web hosts found for tag: ${INSTANCE_TAG}"
+            exit 1
+          fi
+
+          ALB_DNS="$(aws elbv2 describe-load-balancers \
+            --region "${{ secrets.AWS_REGION }}" \
+            --names "${LB_NAME}" \
+            --query 'LoadBalancers[0].DNSName' \
+            --output text)"
+
+          if [ -z "${ALB_DNS}" ] || [ "${ALB_DNS}" = "None" ]; then
+            echo "Could not resolve ALB DNS name for ${LB_NAME}"
+            exit 1
+          fi
+
+          echo "KAMAL_WEB_HOSTS=${WEB_HOSTS}" >> "$GITHUB_ENV"
+          echo "ALLOWED_HOSTS=${ALB_DNS}" >> "$GITHUB_ENV"
+          echo "ALLOWED_CABLE_ORIGINS=http://${ALB_DNS}" >> "$GITHUB_ENV"
+
       - name: Setup SSH key for Kamal
         run: |
+          set -euo pipefail
+
           mkdir -p ~/.ssh
           echo "${{ secrets.KAMAL_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H $(echo "${{ secrets.STAGING_WEB_HOSTS }}" | tr ',' ' ') >> ~/.ssh/known_hosts
+
+          HOST_LIST="${KAMAL_WEB_HOSTS//,/ }"
+          if [ -z "${HOST_LIST}" ]; then
+            echo "KAMAL_WEB_HOSTS is empty"
+            exit 1
+          fi
+
+          ssh-keyscan -H ${HOST_LIST} > ~/.ssh/known_hosts 2>/dev/null
+          if [ ! -s ~/.ssh/known_hosts ]; then
+            echo "Failed to generate known_hosts entries"
+            exit 1
+          fi
+
+          chmod 644 ~/.ssh/known_hosts
 
       - name: Write Kamal secrets file
         run: |
@@ -63,8 +120,7 @@ jobs:
           KAMAL_REGISTRY_PASSWORD: ${{ env.KAMAL_REGISTRY_PASSWORD }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
           ECR_IMAGE_NAME: ${{ secrets.ECR_IMAGE_NAME }}
-          KAMAL_WEB_HOSTS: ${{ secrets.STAGING_WEB_HOSTS }}
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_STAGING }}
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE_STAGING }}
-        run: bundle exec kamal deploy -d staging --skip-push --version "${GITHUB_SHA}" -v
+        run: bundle exec kamal deploy -d staging --skip-push --version "${GITHUB_SHA}"
