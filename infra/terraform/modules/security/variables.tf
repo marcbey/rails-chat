@@ -5,3 +5,8 @@ variable "name_prefix" {
 variable "vpc_id" {
   type = string
 }
+
+variable "ssh_ingress_cidrs" {
+  type    = list(string)
+  default = []
+}

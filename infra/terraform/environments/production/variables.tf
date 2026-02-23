@@ -67,6 +67,11 @@ variable "ssh_public_key" {
   type = string
 }
 
+variable "ssh_ingress_cidrs" {
+  type    = list(string)
+  default = []
+}
+
 variable "github_repo" {
   type    = string
   default = "marcbey/rails-chat"

@@ -9,3 +9,7 @@ variable "github_repo" {
 variable "github_oidc_provider_arn" {
   type = string
 }
+
+variable "allowed_github_subs" {
+  type = list(string)
+}

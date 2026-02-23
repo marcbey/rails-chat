@@ -11,9 +11,10 @@ module "network" {
 }
 
 module "security" {
-  source      = "../../modules/security"
-  name_prefix = var.name_prefix
-  vpc_id      = module.network.vpc_id
+  source            = "../../modules/security"
+  name_prefix       = var.name_prefix
+  vpc_id            = module.network.vpc_id
+  ssh_ingress_cidrs = var.ssh_ingress_cidrs
 }
 
 module "load_balancer" {
@@ -58,6 +59,7 @@ module "iam" {
   name_prefix              = var.name_prefix
   github_repo              = var.github_repo
   github_oidc_provider_arn = local.github_oidc_provider_arn
+  allowed_github_subs      = ["repo:${var.github_repo}:environment:staging"]
 }
 
 module "observability" {

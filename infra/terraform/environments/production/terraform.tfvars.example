@@ -2,6 +2,7 @@ aws_region        = "eu-central-1"
 aws_account_id    = "882873537464"
 name_prefix       = "rails-chat-production"
 ssh_public_key    = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII2ZIBdrgX9vgxCz2WKMju/vi5+0bNTT0jbGkQXp35U6 marc@schopper.rocks"
+ssh_ingress_cidrs = ["203.0.113.10/32"]
 github_repo       = "marcbey/rails-chat"
 web_host_count    = 2
 web_instance_type = "t3.small"
