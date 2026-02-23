@@ -4,6 +4,15 @@ RSpec.describe "ChatRooms", type: :request do
   let(:user_password) { "password123!" }
   let(:user) { User.create!(username: "marc", email_address: "marc@example.com", password: user_password, password_confirmation: user_password) }
 
+  def create_user(username)
+    User.create!(
+      username: username,
+      email_address: "#{username}@example.com",
+      password: user_password,
+      password_confirmation: user_password
+    )
+  end
+
   describe "GET /" do
     it "redirects to sign in when unauthenticated" do
       get root_path
@@ -41,6 +50,29 @@ RSpec.describe "ChatRooms", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Engineering")
+    end
+
+    it "disables mention requirement for bot replies in two-user rooms" do
+      sign_in_as(user, password: user_password)
+      room = ChatRoom.create!(name: "Direct")
+      room.membership_for(user)
+      room.membership_for(create_user("alice"))
+
+      get chat_room_path(room)
+
+      expect(response.body).to include('data-chat-bot-require-mention-value="false"')
+    end
+
+    it "keeps mention requirement for bot replies in rooms with more than two users" do
+      sign_in_as(user, password: user_password)
+      room = ChatRoom.create!(name: "Team")
+      room.membership_for(user)
+      room.membership_for(create_user("alice"))
+      room.membership_for(create_user("bob"))
+
+      get chat_room_path(room)
+
+      expect(response.body).to include('data-chat-bot-require-mention-value="true"')
     end
   end
 end

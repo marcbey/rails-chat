@@ -2,6 +2,7 @@ class ChatMessagesController < ApplicationController
   before_action :set_chat_room
 
   def create
+    @chat_room.membership_for(current_user)
     @chat_message = @chat_room.chat_messages.build(chat_message_params)
     @chat_message.user = current_user
 

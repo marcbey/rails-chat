@@ -24,6 +24,10 @@ class ChatRoom < ApplicationRecord
     chat_room_memberships.find_or_create_by!(user: user)
   end
 
+  def direct_message_room?
+    chat_room_memberships.distinct.count(:user_id) == 2
+  end
+
   private
 
   def assign_slug

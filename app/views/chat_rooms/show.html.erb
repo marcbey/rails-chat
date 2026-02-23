@@ -23,6 +23,7 @@
     data-chat-bot-messages-container-id-value="<%= @chat_room.messages_dom_id %>"
     data-chat-bot-current-username-value="<%= current_user.username %>"
     data-chat-bot-enabled-value="<%= @chat_room_membership.bot_enabled? %>"
+    data-chat-bot-require-mention-value="<%= !@chat_room.direct_message_room? %>"
     data-chat-bot-session-path-value="<%= chat_room_bot_reply_session_path(@chat_room) %>"
     data-chat-bot-context-limit-value="20"
   >

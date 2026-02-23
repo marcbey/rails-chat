@@ -10,6 +10,7 @@ export default class extends Controller {
     messagesContainerId: String,
     currentUsername: String,
     enabled: Boolean,
+    requireMention: { type: Boolean, default: true },
     sessionPath: String,
     contextLimit: { type: Number, default: 20 }
   }
@@ -59,7 +60,8 @@ export default class extends Controller {
 
     const bodyElement = messageElement.querySelector("[data-chat-message-body]")
     const incomingText = bodyElement?.textContent?.trim()
-    if (!incomingText || !this.isMentionForCurrentUser(incomingText)) return
+    if (!incomingText) return
+    if (this.requireMentionValue && !this.isMentionForCurrentUser(incomingText)) return
 
     this.generateReply(incomingText, authorUsername)
   }
