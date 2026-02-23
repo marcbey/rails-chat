@@ -111,6 +111,9 @@ export default class extends Controller {
 
   async openRealtimeConnection(clientSecret) {
     const peerConnection = new RTCPeerConnection()
+    // OpenAI Realtime currently expects an audio m-line in the SDP offer.
+    peerConnection.addTransceiver("audio", { direction: "recvonly" })
+
     const dataChannel = peerConnection.createDataChannel("oai-events")
     const offer = await peerConnection.createOffer()
 
