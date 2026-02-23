@@ -89,6 +89,7 @@ Rails.application.configure do
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   allowed_hosts = ENV.fetch("ALLOWED_HOSTS", "").split(",").map(&:strip).reject(&:empty?)
   config.hosts.concat(allowed_hosts) if allowed_hosts.any?
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
   allowed_cable_origins = ENV.fetch("ALLOWED_CABLE_ORIGINS", "").split(",").map(&:strip).reject(&:empty?)
   config.action_cable.allowed_request_origins = allowed_cable_origins if allowed_cable_origins.any?
