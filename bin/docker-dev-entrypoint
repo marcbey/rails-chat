@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -eu
+
+# The named bundle volume can be empty on first container startup.
+bundle check || bundle install
+
+# Foreman does not run the production entrypoint, so clear stale Rails PID files here.
+rm -f tmp/pids/server.pid
+
+exec bin/dev

@@ -27,3 +27,4 @@
 
 # macOS
 .DS_Store
+tmp/pids/server.pid

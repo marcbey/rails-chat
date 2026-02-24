@@ -13,6 +13,7 @@ services:
   web:
     build:
       context: .
+      target: build
       args:
         RUBY_VERSION: 4.0.1
         BUNDLE_WITHOUT: ""
@@ -31,7 +32,7 @@ services:
       POSTGRES_DB_DEVELOPMENT_CABLE: rails_chat_development_cable
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OPENAI_REALTIME_MODEL: ${OPENAI_REALTIME_MODEL:-gpt-realtime-mini}
-    command: bin/dev
+    command: bin/docker-dev-entrypoint
     ports:
       - "3000:3000"
     volumes:
