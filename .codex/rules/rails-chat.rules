@@ -1,0 +1,565 @@
+# Project rules for rails-chat.
+# Goal: autonomous day-to-day development in this repo without full-access.
+# Anything not matched here falls back to approval_policy="untrusted".
+
+# ---------------------------------------------------------------------------
+# Local debugging / inspection commands used in this project
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["pwd"], decision="allow")
+prefix_rule(pattern=["ls"], decision="allow")
+prefix_rule(pattern=["find"], decision="allow")
+prefix_rule(pattern=["rg"], decision="allow")
+prefix_rule(pattern=["sed"], decision="allow")
+prefix_rule(pattern=["cat"], decision="allow")
+prefix_rule(pattern=["nl"], decision="allow")
+prefix_rule(pattern=["head"], decision="allow")
+prefix_rule(pattern=["tail"], decision="allow")
+prefix_rule(pattern=["awk"], decision="allow")
+prefix_rule(pattern=["jq"], decision="allow")
+prefix_rule(pattern=["echo"], decision="allow")
+prefix_rule(pattern=["printf"], decision="allow")
+prefix_rule(pattern=["sleep"], decision="allow")
+prefix_rule(pattern=["which"], decision="allow")
+prefix_rule(pattern=["realpath"], decision="allow")
+prefix_rule(pattern=["strings"], decision="allow")
+prefix_rule(pattern=["dig"], decision="allow")
+prefix_rule(pattern=["curl"], decision="allow")
+prefix_rule(pattern=["mkdir"], decision="allow")
+prefix_rule(pattern=["cp"], decision="allow")
+prefix_rule(pattern=["mv"], decision="allow")
+prefix_rule(pattern=["chmod"], decision="allow")
+
+# ---------------------------------------------------------------------------
+# Git workflows used in this project
+# ---------------------------------------------------------------------------
+prefix_rule(
+    pattern=[
+        "git",
+        [
+            "status",
+            "diff",
+            "log",
+            "show",
+            "branch",
+            "rev-parse",
+            "ls-files",
+            "add",
+            "commit",
+            "push",
+            "pull",
+            "checkout",
+            "switch",
+            "fetch",
+            "merge",
+            "rebase",
+            "restore",
+            "stash",
+            "remote",
+            "init",
+            "clone",
+            "rm"
+        ]
+    ],
+    decision="allow"
+)
+
+# ---------------------------------------------------------------------------
+# Rails / Bundler / Mise workflows
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["bundle", "install"], decision="allow")
+prefix_rule(
+    pattern=["bundle", "exec", ["rspec", "rubocop", "rake", "rails", "brakeman", "bundler-audit"]],
+    decision="allow"
+)
+prefix_rule(pattern=["bin/rspec"], decision="allow")
+prefix_rule(pattern=["bin/rubocop"], decision="allow")
+prefix_rule(pattern=["bin/rake"], decision="allow")
+prefix_rule(pattern=["bin/rails"], decision="allow")
+prefix_rule(pattern=["bin/docker-dev"], decision="allow")
+
+prefix_rule(pattern=["mise", "exec", "--", "bundle", "install"], decision="allow")
+prefix_rule(
+    pattern=[
+        "mise",
+        "exec",
+        "--",
+        "bundle",
+        "exec",
+        ["rspec", "rubocop", "rake", "rails", "brakeman", "bundler-audit"]
+    ],
+    decision="allow"
+)
+prefix_rule(pattern=["mise", "exec", "--", "bin/rspec"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bin/rubocop"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bin/rake"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bin/rails"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bin/docker-dev"], decision="allow")
+
+# ---------------------------------------------------------------------------
+# Docker commands used in local development/debugging
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["docker", "compose"], decision="allow")
+prefix_rule(pattern=["docker", "run"], decision="allow")
+prefix_rule(pattern=["docker", "rm"], decision="allow")
+prefix_rule(pattern=["docker", "ps"], decision="allow")
+prefix_rule(pattern=["docker", "logs"], decision="allow")
+prefix_rule(pattern=["docker", "build"], decision="allow")
+
+# ---------------------------------------------------------------------------
+# Terraform commands: allow bootstrap/staging, prompt production
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["terraform", "version"], decision="allow")
+prefix_rule(pattern=["terraform", "fmt"], decision="allow")
+prefix_rule(pattern=["terraform", "validate"], decision="allow")
+prefix_rule(pattern=["terraform", "-chdir=infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["terraform", "-chdir=infra/terraform/environments/staging"], decision="allow")
+prefix_rule(pattern=["terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/staging"], decision="allow")
+
+# Equivalent terraform invocation via env prefix.
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/environments/staging"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/staging"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "version"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "fmt"], decision="allow")
+prefix_rule(pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "validate"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/bootstrap"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/environments/staging"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/staging"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "version"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "fmt"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "terraform", "validate"], decision="allow")
+
+prefix_rule(
+    pattern=["terraform", "-chdir=infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["env", "AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "terraform", "-chdir=/Users/marc/Projects/rails-chat/infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Production Terraform command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["cd", "/Users/marc/Projects/rails-chat/infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Changing into production Terraform directory requires confirmation."
+)
+prefix_rule(
+    pattern=["cd", "infra/terraform/environments/production"],
+    decision="prompt",
+    justification="Changing into production Terraform directory requires confirmation."
+)
+
+# ---------------------------------------------------------------------------
+# AWS CLI commands used for identity and read/debug checks
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["aws", "sts", "get-caller-identity"], decision="allow")
+prefix_rule(pattern=["aws", "configure", "list-profiles"], decision="allow")
+prefix_rule(pattern=["aws", "sso", "login"], decision="allow")
+prefix_rule(pattern=["aws", "ec2", "describe-instances"], decision="allow")
+prefix_rule(pattern=["aws", "ec2", "describe-security-groups"], decision="allow")
+prefix_rule(pattern=["aws", "ec2", "describe-key-pairs"], decision="allow")
+prefix_rule(pattern=["aws", "rds", "describe-db-instances"], decision="allow")
+prefix_rule(pattern=["aws", "ecr", "describe-repositories"], decision="allow")
+prefix_rule(pattern=["aws", "ecr", "list-images"], decision="allow")
+prefix_rule(pattern=["aws", "elbv2", "describe-load-balancers"], decision="allow")
+prefix_rule(pattern=["aws", "elbv2", "describe-target-health"], decision="allow")
+prefix_rule(pattern=["aws", "elbv2", "describe-target-groups"], decision="allow")
+prefix_rule(pattern=["aws", "autoscaling", "describe-auto-scaling-groups"], decision="allow")
+prefix_rule(pattern=["aws", "autoscaling", "describe-instance-refreshes"], decision="allow")
+prefix_rule(pattern=["aws", "iam", "list-roles"], decision="allow")
+prefix_rule(pattern=["aws", "logs", "describe-log-groups"], decision="allow")
+prefix_rule(pattern=["aws", "secretsmanager", ["list-secrets", "describe-secret", "get-secret-value"]], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "sts", "get-caller-identity"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "configure", "list-profiles"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "sso", "login"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "ec2", "describe-instances"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "ec2", "describe-security-groups"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "ec2", "describe-key-pairs"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "rds", "describe-db-instances"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "describe-repositories"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "list-images"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "elbv2", "describe-load-balancers"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "elbv2", "describe-target-health"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "elbv2", "describe-target-groups"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "autoscaling", "describe-auto-scaling-groups"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "autoscaling", "describe-instance-refreshes"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "iam", "list-roles"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "logs", "describe-log-groups"], decision="allow")
+prefix_rule(pattern=["AWS_PROFILE=rails-chat", "aws", "secretsmanager", ["list-secrets", "describe-secret", "get-secret-value"]], decision="allow")
+
+# Mutating AWS commands: explicit staging allow, production-specific prompts below.
+prefix_rule(
+    pattern=["aws", "ecr", "delete-repository"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "delete-repository"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "ecr", "batch-delete-image"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "batch-delete-image"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "autoscaling", "start-instance-refresh"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "autoscaling", "start-instance-refresh"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "secretsmanager", "delete-secret"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "secretsmanager", "delete-secret"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "acm", "request-certificate"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "acm", "request-certificate"],
+    decision="allow"
+)
+
+# Explicit staging mutations are allowed.
+prefix_rule(
+    pattern=["aws", "ecr", "delete-repository", "--repository-name", "rails-chat-staging/rails-chat"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "delete-repository", "--repository-name", "rails-chat-staging/rails-chat"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "ecr", "batch-delete-image", "--region", "eu-central-1", "--repository-name", "rails-chat-staging/rails-chat"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "batch-delete-image", "--region", "eu-central-1", "--repository-name", "rails-chat-staging/rails-chat"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "autoscaling", "start-instance-refresh", "--auto-scaling-group-name", "rails-chat-staging-asg"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "autoscaling", "start-instance-refresh", "--auto-scaling-group-name", "rails-chat-staging-asg"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "secretsmanager", "delete-secret", "--secret-id", "rails-chat-staging/db/password"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "secretsmanager", "delete-secret", "--secret-id", "rails-chat-staging/db/password"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["aws", "acm", "request-certificate", "--domain-name", "chat-staging.schopp3r.de"],
+    decision="allow"
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "acm", "request-certificate", "--domain-name", "chat-staging.schopp3r.de"],
+    decision="allow"
+)
+
+# Production-specific AWS read/write commands require approval.
+prefix_rule(
+    pattern=["aws", "elbv2", "describe-load-balancers", "--names", "rails-chat-production-alb"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "elbv2", "describe-load-balancers", "--names", "rails-chat-production-alb"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "ecr", "list-images", "--region", "eu-central-1", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "list-images", "--region", "eu-central-1", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "ec2", "describe-security-groups", "--filters", "Name=group-name,Values=rails-chat-production-web-sg"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ec2", "describe-security-groups", "--filters", "Name=group-name,Values=rails-chat-production-web-sg"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "ecr", "delete-repository", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "delete-repository", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "ecr", "batch-delete-image", "--region", "eu-central-1", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "ecr", "batch-delete-image", "--region", "eu-central-1", "--repository-name", "rails-chat-production/rails-chat"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "autoscaling", "start-instance-refresh", "--auto-scaling-group-name", "rails-chat-production-asg"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "autoscaling", "start-instance-refresh", "--auto-scaling-group-name", "rails-chat-production-asg"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "secretsmanager", "delete-secret", "--secret-id", "rails-chat-production/db/password"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "secretsmanager", "delete-secret", "--secret-id", "rails-chat-production/db/password"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["aws", "acm", "request-certificate", "--domain-name", "chat.schopp3r.de"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["AWS_PROFILE=rails-chat", "aws", "acm", "request-certificate", "--domain-name", "chat.schopp3r.de"],
+    decision="prompt",
+    justification="Production infrastructure command detected. Please confirm before running."
+)
+
+# ---------------------------------------------------------------------------
+# GitHub CLI workflows
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["gh", "--version"], decision="allow")
+prefix_rule(pattern=["gh", "auth", "status"], decision="allow")
+prefix_rule(pattern=["gh", "run", ["list", "view", "watch"]], decision="allow")
+prefix_rule(pattern=["gh", "pr", ["list", "view"]], decision="allow")
+prefix_rule(pattern=["gh", "secret", "list"], decision="allow")
+prefix_rule(pattern=["gh", "workflow", "run", "deploy-staging.yml"], decision="allow")
+prefix_rule(pattern=["gh", "workflow", "run", "Deploy Staging"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "DATABASE_URL_STAGING"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "OPENAI_API_KEY_STAGING"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "STAGING_WEB_HOSTS"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "ALLOWED_HOSTS"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "ALLOWED_CABLE_ORIGINS"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "KAMAL_SSH_KNOWN_HOSTS"], decision="allow")
+prefix_rule(pattern=["gh", "secret", "set", "ECR_IMAGE_NAME"], decision="allow")
+
+prefix_rule(
+    pattern=["gh", "workflow", "run", "deploy-production.yml"],
+    decision="prompt",
+    justification="Production workflow command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "workflow", "run", "Deploy Production"],
+    decision="prompt",
+    justification="Production workflow command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "DATABASE_URL_PRODUCTION"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "OPENAI_API_KEY_PRODUCTION"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "PRODUCTION_WEB_HOSTS"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "RAILS_MASTER_KEY_PRODUCTION"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "SECRET_KEY_BASE_PRODUCTION"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "secret", "set", "--env", "production"],
+    decision="prompt",
+    justification="Production environment secret command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "pr", "merge"],
+    decision="prompt",
+    justification="PR merge detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["gh", "repo", "create"],
+    decision="prompt",
+    justification="Repository mutation detected. Please confirm before running."
+)
+
+# ---------------------------------------------------------------------------
+# SSH: allow keyscan, require approval for remote shell access
+# ---------------------------------------------------------------------------
+prefix_rule(pattern=["ssh-keyscan"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@18.199.152.107"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@18.199.152.107"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@18.199.152.107"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@3.71.111.145"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@3.71.111.145"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@3.71.111.145"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@3.67.174.170"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@3.67.174.170"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@3.67.174.170"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@18.199.152.107"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@3.75.191.255"], decision="allow")
+prefix_rule(pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-new", "ec2-user@18.199.152.107"], decision="allow")
+prefix_rule(
+    pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@18.193.113.11"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+prefix_rule(
+    pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@18.193.113.11"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+prefix_rule(
+    pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@18.193.113.11"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+prefix_rule(
+    pattern=["ssh", "-i", "~/.ssh/rails_chat_kamal", "ec2-user@63.180.167.155"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+prefix_rule(
+    pattern=["ssh", "-i", "$HOME/.ssh/rails_chat_kamal", "ec2-user@63.180.167.155"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+prefix_rule(
+    pattern=["ssh", "-i", "/Users/marc/.ssh/rails_chat_kamal", "ec2-user@63.180.167.155"],
+    decision="prompt",
+    justification="Production host access requires confirmation."
+)
+
+# ---------------------------------------------------------------------------
+# Prompt for destructive Rails tasks (despite broad Rails allows)
+# ---------------------------------------------------------------------------
+prefix_rule(
+    pattern=["bundle", "exec", "rails", ["db:drop", "db:purge", "db:reset", "db:truncate_all", "destroy"]],
+    decision="prompt",
+    justification="Potentially destructive Rails task. Please confirm before running."
+)
+prefix_rule(
+    pattern=["bin/rails", ["db:drop", "db:purge", "db:reset", "db:truncate_all", "destroy"]],
+    decision="prompt",
+    justification="Potentially destructive Rails task. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "--", "bundle", "exec", "rails", ["db:drop", "db:purge", "db:reset", "db:truncate_all", "destroy"]],
+    decision="prompt",
+    justification="Potentially destructive Rails task. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "--", "bin/rails", ["db:drop", "db:purge", "db:reset", "db:truncate_all", "destroy"]],
+    decision="prompt",
+    justification="Potentially destructive Rails task. Please confirm before running."
+)
+
+# Staging Kamal deploy/lock actions used in this project.
+prefix_rule(pattern=["bundle", "exec", "kamal", "deploy", "-d", "staging"], decision="allow")
+prefix_rule(pattern=["bundle", "exec", "kamal", "lock", "release", "-d", "staging"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bundle", "exec", "kamal", "deploy", "-d", "staging"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "--", "bundle", "exec", "kamal", "lock", "release", "-d", "staging"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "ruby@4.0.1", "--", "bundle", "exec", "kamal", "deploy", "-d", "staging"], decision="allow")
+prefix_rule(pattern=["mise", "exec", "ruby@4.0.1", "--", "bundle", "exec", "kamal", "lock", "release", "-d", "staging"], decision="allow")
+
+# Any explicit production Kamal action requires approval.
+prefix_rule(
+    pattern=["bundle", "exec", "kamal", "deploy", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["bundle", "exec", "kamal", "lock", "release", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "--", "bundle", "exec", "kamal", "deploy", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "--", "bundle", "exec", "kamal", "lock", "release", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "ruby@4.0.1", "--", "bundle", "exec", "kamal", "deploy", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
+prefix_rule(
+    pattern=["mise", "exec", "ruby@4.0.1", "--", "bundle", "exec", "kamal", "lock", "release", "-d", "production"],
+    decision="prompt",
+    justification="Production deploy command detected. Please confirm before running."
+)
